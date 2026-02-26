@@ -17,6 +17,9 @@ inputs:
     description: 'AMI OS type'
     required: true
     default: 'linux'
+  role_to_assume:
+    description: 'The ARN of the IAM role to assume (pass secret here)'
+    required: true
 
 outputs:
   ami_id:
@@ -38,5 +41,5 @@ runs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: ${{ secrets.BK_ROLE_TO_ASSUME }}
+        role-to-assume: ${{ inputs.role_to_assume }}
         aws-region: 'us-east-1' 
