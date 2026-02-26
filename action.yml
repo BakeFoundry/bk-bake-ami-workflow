@@ -1,0 +1,42 @@
+name: 'Bake AMI Workflow'
+description: 'Orchestrates the AMI baking process using bk-bake-ami'
+inputs:
+  ami_name:
+    description: 'AMI name filter'
+    required: true
+    default: 'al2023-ami-2023*-kernel-6.1-x86_64'
+  ami_owner:
+    description: 'AMI owner'
+    required: true
+    default: 'amazon'
+  architecture:
+    description: 'AMI architecture'
+    required: true
+    default: 'x86_64'
+  os_type:
+    description: 'AMI OS type'
+    required: true
+    default: 'linux'
+
+outputs:
+  ami_id:
+    description: 'The ID of the baked AMI'
+    value: ${{ steps.bake.outputs.ami_id }}
+  ami_name:
+    description: 'The name of the baked AMI'
+    value: ${{ steps.bake.outputs.ami_name }}
+  ami_arn:
+    description: 'The ARN of the baked AMI'
+    value: ${{ steps.bake.outputs.ami_arn }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.BK_ROLE_TO_ASSUME }}
+        aws-region: 'us-east-1' 
