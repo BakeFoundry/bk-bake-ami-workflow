@@ -9,11 +9,11 @@ inputs:
     description: 'AMI owner'
     required: true
     default: 'amazon'
-  architecture:
+  ami_architecture:
     description: 'AMI architecture'
     required: true
     default: 'x86_64'
-  os_type:
+  ami_os_type:
     description: 'AMI OS type'
     required: true
     default: 'linux'
