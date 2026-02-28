@@ -38,6 +38,10 @@ runs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
 
+    - name: Display role to assume
+      run: echo "Assuming role ${{ inputs.role_to_assume }}"
+      shell: bash
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
