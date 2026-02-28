@@ -44,6 +44,6 @@ runs:
         role-to-assume: ${{ inputs.role_to_assume }}
         aws-region: 'us-east-1'
 
-    - name: test aws credentials from oidc
+    - name: test aws credentials
       run: aws sts get-caller-identity
       shell: bash
