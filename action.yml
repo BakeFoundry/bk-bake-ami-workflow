@@ -65,7 +65,7 @@ runs:
         TF_VAR_ami_owner: ${{ inputs.ami_owner }}
         TF_VAR_ami_architecture: ${{ inputs.ami_architecture }}
         TF_VAR_ami_os_type: ${{ inputs.ami_os_type }}
-        TF_VAR_baking_recipe_playbook: ${{ inputs.baking_recipe_playbook }}
+        TF_VAR_baking_recipe_playbook: ${{ github.workspace }}/${{ inputs.baking_recipe_playbook }}
         TF_VAR_application_name: ${{ inputs.application_name }}
       run: |
         cd $GITHUB_ACTION_PATH/terraform
