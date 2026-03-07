@@ -20,6 +20,12 @@ inputs:
   role_to_assume:
     description: 'The ARN of the IAM role to assume (pass secret here)'
     required: true
+  baking_recipe_playbook:
+    description: 'The path to the baking recipe playbook'
+    required: true
+  application_name:
+    description: 'The name of the application'
+    required: true
 
 outputs:
   ami_id:
@@ -48,43 +54,21 @@ runs:
         role-to-assume: ${{ inputs.role_to_assume }}
         aws-region: 'us-east-1'
 
-    - name: test aws credentials
-      run: aws sts get-caller-identity
-      shell: bash
-
-    - name: Get Latest AMI
+    - name: Bake AMI
       id: bake
-      if: success()
       shell: bash
+      # Terraform variables are passed using the TF_VAR_<variable_name> environment variables.
+      # These environment variables map directly to the variables defined in terraform/variables.tf
+      # and are accessible inside terraform/main.tf via var.<variable_name>.
+      env:
+        TF_VAR_ami_name: ${{ inputs.ami_name }}
+        TF_VAR_ami_owner: ${{ inputs.ami_owner }}
+        TF_VAR_ami_architecture: ${{ inputs.ami_architecture }}
+        TF_VAR_ami_os_type: ${{ inputs.ami_os_type }}
+        TF_VAR_baking_recipe_playbook: ${{ inputs.baking_recipe_playbook }}
+        TF_VAR_application_name: ${{ inputs.application_name }}
       run: |
-        mkdir -p _bake_ami_tmp
-        cd _bake_ami_tmp
-        cat <<EOF > main.tf
-        provider "aws" {
-          region = "us-east-1"
-        }
-
-        module "ami_fetcher" {
-          source           = "github.com/BakeFoundry/bk-bake-ami-module?ref=v1"
-          ami_name         = "${{ inputs.ami_name }}"
-          ami_owner        = "${{ inputs.ami_owner }}"
-          ami_architecture = "${{ inputs.ami_architecture }}"
-          ami_os_type      = "${{ inputs.ami_os_type }}"
-        }
-
-        output "ami_id" {
-          value = module.ami_fetcher.ami_id
-        }
-
-        output "ami_name" {
-          value = module.ami_fetcher.ami_name
-        }
-
-        output "ami_arn" {
-          value = module.ami_fetcher.ami_arn
-        }
-        EOF
-
+        cd terraform
         terraform init
         terraform apply -auto-approve
 
@@ -92,8 +76,6 @@ runs:
         echo "ami_name=$(terraform output -raw ami_name)" >> $GITHUB_OUTPUT
         echo "ami_arn=$(terraform output -raw ami_arn)" >> $GITHUB_OUTPUT
 
-        cd ..
-        rm -rf _bake_ami_tmp
 
     - name: Display Fetch AMI ID and AMT Name
       if: success()
