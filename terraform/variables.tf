@@ -17,3 +17,13 @@ variable "ami_os_type" {
   description = "AMI OS type"
   type        = string
 }
+
+variable "baking_recipe_playbook" {
+  description = "Baking recipe playbook"
+  type        = string
+}
+
+variable "application_name" {
+  description = "Application name"
+  type        = string
+}
