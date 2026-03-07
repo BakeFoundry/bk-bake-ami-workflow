@@ -68,7 +68,7 @@ runs:
         TF_VAR_baking_recipe_playbook: ${{ inputs.baking_recipe_playbook }}
         TF_VAR_application_name: ${{ inputs.application_name }}
       run: |
-        cd terraform
+        cd $GITHUB_ACTION_PATH/terraform
         terraform init
         terraform apply -auto-approve
 
