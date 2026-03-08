@@ -27,3 +27,8 @@ variable "application_name" {
   description = "Application name"
   type        = string
 }
+
+variable "version_tag" {
+  description = "Version tag for the AMI"
+  type        = string
+}
