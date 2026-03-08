@@ -26,6 +26,9 @@ inputs:
   application_name:
     description: 'The name of the application'
     required: true
+  version_tag:
+    description: 'The version tag for the AMI'
+    required: true
 
 outputs:
   ami_id:
@@ -67,6 +70,7 @@ runs:
         TF_VAR_ami_os_type: ${{ inputs.ami_os_type }}
         TF_VAR_baking_recipe_playbook: ${{ github.workspace }}/${{ inputs.baking_recipe_playbook }}
         TF_VAR_application_name: ${{ inputs.application_name }}
+        TF_VAR_version_tag: ${{ inputs.version_tag }}
       run: |
         cd $GITHUB_ACTION_PATH/terraform
         terraform init
