@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "bake-ami" {
-  source                 = "github.com/BakeFoundry/bk-bake-ami-module?ref=1287c3376c772b025d131b57e169a6044ba6c044"
+  source                 = "github.com/BakeFoundry/bk-bake-ami-module?ref=f1050330dbffbf9e1cdc058b48a70bfab13ff993"
   ami_name               = var.ami_name
   ami_owner              = var.ami_owner
   ami_architecture       = var.ami_architecture
@@ -13,7 +13,7 @@ module "bake-ami" {
 }
 
 module "ami_builder" {
-  source = "github.com/BakeFoundry/bk-bake-ami-module?ref=1287c3376c772b025d131b57e169a6044ba6c044"
+  source = "github.com/BakeFoundry/bk-bake-ami-module?ref=f1050330dbffbf9e1cdc058b48a70bfab13ff993"
 
   depends_on = [module.ami_fetcher]
 
