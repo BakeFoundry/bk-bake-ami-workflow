@@ -8,10 +8,11 @@ This is a **GitHub Composite Action** (`action.yml`) that automates AWS AMI baki
 
 ## Commands
 
-### Pre-commit / Linting
+### Pre-commit / Linting (requires Docker)
 ```bash
 pre-commit run --all-files
 ```
+The terraform-fmt and checkov hooks run via Docker images, so Docker must be running.
 
 ### Terraform (manual validation)
 ```bash
@@ -34,33 +35,26 @@ docker run --rm -v $(pwd):/tf bridgecrew/checkov:latest -d /tf
 action.yml inputs
     → TF_VAR_* environment variables
     → terraform/ (init + apply)
-    → external module: BakeFoundry/bk-bake-ami-module@e886d3c6
+    → module "bake-ami" (BakeFoundry/bk-bake-ami-module@f1050330)
         → fetches base AMI (filtered by name/owner/architecture/os_type)
         → runs Ansible playbook (baking_recipe)
         → creates baked AMI
     → terraform outputs (ami_id, ami_name, ami_arn)
-    → action.yml step outputs
+    → action.yml step outputs via $GITHUB_OUTPUT
 ```
 
 ### Key Files
 
 - **`action.yml`**: Composite action definition — inputs, AWS OIDC auth, Terraform execution, output extraction
-- **`terraform/main.tf`**: AWS provider (us-east-1) + instantiates `bk-bake-ami-module`
-- **`terraform/variables.tf`**: 7 input variables mirroring action inputs
+- **`terraform/main.tf`**: AWS provider (us-east-1) + instantiates `bk-bake-ami-module` as `module.bake-ami`
+- **`terraform/variables.tf`**: Input variables mirroring action inputs
 - **`terraform/outputs.tf`**: Passes `ami_id`, `ami_name`, `ami_arn` from module back to action
 
-### Action Inputs
+### Known Inconsistencies
 
-| Input | Description |
-|---|---|
-| `ami_name` | Base AMI name filter pattern |
-| `ami_owner` | AMI owner (e.g. `"amazon"`) |
-| `ami_architecture` | Architecture (e.g. `"x86_64"`) |
-| `ami_os_type` | OS type (e.g. `"linux"`) |
-| `role_to_assume` | AWS IAM role ARN (OIDC) |
-| `baking_recipe_playbook` | Absolute path to Ansible playbook |
-| `application_name` | Application identifier for the AMI |
-| `version_tag` | Version tag for the baked AMI |
+- `terraform/outputs.tf` references `module.ami_fetcher` but `main.tf` defines the module as `module.bake-ami` — these must match for Terraform to work
+- `version_tag` is declared in `variables.tf` and set via `TF_VAR_version_tag` in `action.yml`, but is **not passed** to the module in `main.tf`
+- `README.md` documents outdated inputs (e.g. `vpc_name`, `github_token`, `aws_region`) that no longer exist in `action.yml`
 
 ### External Module Dependency
 
@@ -69,11 +63,12 @@ The Terraform module source is pinned to a specific commit of `BakeFoundry/bk-ba
 ### CI/CD Workflows
 
 - **`pre-commit.yml`**: Runs pre-commit hooks on all pushes/PRs
-- **`version.yml`**: Semantic versioning and automated releases via `bakefoundry/bk-release-workflow@v1` (triggered on push/PR to main)
-- **`notify-pr.yml`**: Sends Discord notifications on PR events via `BakeFoundry/bk-bake-pr-reviewes@v1`
+- **`version.yml`**: Semantic versioning via `bakefoundry/bk-release-workflow@v1` — runs `dry-run` on PRs, real release on push to main
+- **`notify-pr.yml`**: Discord notifications on PR events via `BakeFoundry/bk-bake-pr-reviewes@v1`
 
 ## Important Notes
 
-- `baking_recipe_playbook` must be an **absolute path** (use `${{ github.workspace }}/path/to/playbook.yml` in callers)
+- `baking_recipe_playbook` must be an **absolute path** — the action prepends `${{ github.workspace }}/` to the input value
 - AWS authentication uses OIDC — no static credentials; `role_to_assume` must have appropriate permissions
-- Terraform state is not stored remotely in this repo; it runs ephemerally within the GitHub Actions runner
+- Terraform state is not stored remotely; it runs ephemerally within the GitHub Actions runner
+- Terraform is pinned to `$GITHUB_ACTION_PATH/terraform` so it resolves relative to the action, not the caller's workspace
