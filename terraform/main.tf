@@ -2,8 +2,8 @@ provider "aws" {
   region = "us-east-1"
 }
 
-module "ami_fetcher" {
-  source                 = "github.com/BakeFoundry/bk-bake-ami-module?ref=e886d3c6f419f78aa4d0419639cf920e6c9a10d5"
+module "bake-ami" {
+  source                 = "github.com/BakeFoundry/bk-bake-ami-module?ref=8f3998ff1a3d20786d9358d4fb2ff952f0c5268c"
   ami_name               = var.ami_name
   ami_owner              = var.ami_owner
   ami_architecture       = var.ami_architecture
