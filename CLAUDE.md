@@ -52,13 +52,11 @@ action.yml inputs
 
 ### Known Inconsistencies
 
-- `terraform/outputs.tf` references `module.ami_fetcher` but `main.tf` defines the module as `module.bake-ami` — these must match for Terraform to work
-- `version_tag` is declared in `variables.tf` and set via `TF_VAR_version_tag` in `action.yml`, but is **not passed** to the module in `main.tf`
 - `README.md` documents outdated inputs (e.g. `vpc_name`, `github_token`, `aws_region`) that no longer exist in `action.yml`
 
 ### External Module Dependency
 
-The Terraform module source is pinned to a specific commit of `BakeFoundry/bk-bake-ami-module`. To upgrade the module, update the `ref=` value in `terraform/main.tf`.
+The Terraform module source is pinned to commit `d3fd8ac3d62e6b8e147642d26b3eaf12f5772e2b` of `BakeFoundry/bk-bake-ami-module`. To upgrade the module, update the `ref=` value in `terraform/main.tf`.
 
 ### CI/CD Workflows
 

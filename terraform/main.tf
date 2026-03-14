@@ -10,4 +10,5 @@ module "bake-ami" {
   ami_os_type            = var.ami_os_type
   baking_recipe_playbook = var.baking_recipe_playbook
   application_name       = var.application_name
+  version_tag            = var.version_tag
 }
