@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "bake-ami" {
-  source                 = "github.com/BakeFoundry/bk-bake-ami-module?ref=f1050330dbffbf9e1cdc058b48a70bfab13ff993"
+  source                 = "github.com/BakeFoundry/bk-bake-ami-module?ref=d3fd8ac3d62e6b8e147642d26b3eaf12f5772e2b"
   ami_name               = var.ami_name
   ami_owner              = var.ami_owner
   ami_architecture       = var.ami_architecture
